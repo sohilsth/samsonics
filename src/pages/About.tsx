@@ -49,29 +49,6 @@ export default function About() {
     { label: "Years in Business", value: 10, suffix: "+", icon: Heart, key: "years" },
   ];
 
-  const team: TeamMember[] = [
-    {
-      name: "Sohil Shrestha",
-      role: "CEO & Founder",
-      image: "e",
-      description: "Tech enthusiast with 15 years in the electronics industry",
-      skills: ["Leadership", "Strategy", "Innovation"]
-    },
-    {
-      name: "Sohil Shrestha",
-      role: "Head of Product Development",
-      image: "",
-      description: "Leading our technical innovation and product development",
-      skills: ["Engineering", "Product Design", "R&D"]
-    },
-    {
-      name: "Sohil Shrestha",
-      role: "Head of Customer Service",
-      image: "",
-      description: "Ensuring exceptional customer experience and satisfaction",
-      skills: ["Customer Care", "Communication", "Problem Solving"]
-    }
-  ];
 
   const milestones: Milestone[] = [
     { year: "2014", title: "Company Founded", description: "Started in a garage with big dreams" },
@@ -321,54 +298,6 @@ export default function About() {
         </div>
       </section>
 
-      {/* Interactive Team Section */}
-      <section className="py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-foreground mb-4">Meet Our Team</h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto text-balance">
-              The passionate people behind Samsonix who make it all happen
-            </p>
-          </div>
-          
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {team.map((member, index) => (
-              <Card key={index} className="group overflow-hidden hover:shadow-2xl transition-all duration-500 hover:-translate-y-4 border-0 bg-gradient-to-br from-card to-background">
-                <CardContent className="p-0">
-                  <div className="aspect-square overflow-hidden relative">
-                    <img 
-                      src={member.image} 
-                      alt={member.name}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                    <div className="absolute bottom-4 left-4 right-4 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300 opacity-0 group-hover:opacity-100">
-                      <div className="flex flex-wrap gap-2">
-                        {member.skills.map((skill, skillIndex) => (
-                          <span key={skillIndex} className="px-3 py-1 bg-primary/90 text-primary-foreground text-xs rounded-full font-medium">
-                            {skill}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                  <div className="p-6 text-center">
-                    <h3 className="text-xl font-bold text-foreground mb-1 group-hover:text-primary transition-colors">
-                      {member.name}
-                    </h3>
-                    <p className="text-primary font-medium mb-3">
-                      {member.role}
-                    </p>
-                    <p className="text-sm text-muted-foreground leading-relaxed">
-                      {member.description}
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
 
       {/* FAQ Section */}
       <section className="py-20 bg-card">
