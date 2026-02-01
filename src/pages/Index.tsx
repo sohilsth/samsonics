@@ -183,7 +183,7 @@ export default function Index() {
               {/* Product Image Only, no container */}
               <div className="flex flex-col items-center justify-center w-full">
                 <img 
-                  src="/banner.png" 
+                  src="https://res.cloudinary.com/datiygvop/image/upload/v1769928304/Banner_x8pmpg.png" 
                   alt="Latest Electronics"
                   width={700}
                   height={500}
