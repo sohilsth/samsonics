@@ -183,7 +183,7 @@ export default function Index() {
               {/* Product Image Only, no container */}
               <div className="flex flex-col items-center justify-center w-full">
                 <img 
-                  src="public/banner.png" 
+                  src="/banner.png" 
                   alt="Latest Electronics"
                   width={700}
                   height={500}
