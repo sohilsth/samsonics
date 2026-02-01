@@ -34,7 +34,7 @@ export interface ProductAttribute {
   categoryAttributeId: string;
   attributeName: string;
   attributeValue: string;
-  productAttributeType: 'dropdown' | 'string' | 'checkbox';
+  productAttributeType: 'dropdown' | 'string' ;
 }
 
 export interface Product {
