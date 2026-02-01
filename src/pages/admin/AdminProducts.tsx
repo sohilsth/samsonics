@@ -347,74 +347,71 @@ export default function AdminProducts() {
                   />
 
                   {/* Dynamic attributes based on selected category */}
-                  {selectedCategoryAttributes.length > 0 && (
-                    <FormField
-                      control={form.control}
-                      name="productAttributes"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Product Attributes</FormLabel>
-                          {selectedCategoryAttributes.map((attr, index) => (
-                            <div key={attr.attributeId} className="space-y-2">
-                              <FormLabel>
-                                {attr.attributeName} {attr.isRequired && <span className="text-red-500">*</span>}
-                              </FormLabel>
-                              {attr.type === "dropdown" ? (
-                                <Select
-                                  value={field.value?.[index]?.attributeValue || ""}
-                                  onValueChange={(value) => {
-                                    const newAttributes = [...(field.value || [])];
-                                    newAttributes[index] = {
-                                      categoryAttributeId: attr.attributeId!,
-                                      attributeValue: value,
-                                    };
-                                    field.onChange(newAttributes);
-                                  }}
-                                >
-                                  <SelectTrigger>
-                                    <SelectValue placeholder={`Select ${attr.attributeName}`} />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    {attr.possibleValuesJson.map((value) => (
-                                      <SelectItem key={value} value={value}>
-                                        {value}
-                                      </SelectItem>
-                                    ))}
-                                  </SelectContent>
-                                </Select>
-                              ) : attr.type === "checkbox" ? (
-                                <Checkbox
-                                  checked={field.value?.[index]?.attributeValue === "true"}
-                                  onCheckedChange={(checked) => {
-                                    const newAttributes = [...(field.value || [])];
-                                    newAttributes[index] = {
-                                      categoryAttributeId: attr.attributeId!,
-                                      attributeValue: checked ? "true" : "false",
-                                    };
-                                    field.onChange(newAttributes);
-                                  }}
-                                />
-                              ) : (
-                                <Input
-                                  value={field.value?.[index]?.attributeValue || ""}
-                                  onChange={(e) => {
-                                    const newAttributes = [...(field.value || [])];
-                                    newAttributes[index] = {
-                                      categoryAttributeId: attr.attributeId!,
-                                      attributeValue: e.target.value,
-                                    };
-                                    field.onChange(newAttributes);
-                                  }}
-                                  placeholder={`Enter ${attr.attributeName}`}
-                                />
-                              )}
-                            </div>
-                          ))}
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  )}
+{selectedCategoryAttributes.length > 0 && (
+  <FormField
+    control={form.control}
+    name="productAttributes"
+    render={({ field }) => (
+      <FormItem>
+        <FormLabel>Product Attributes</FormLabel>
+        {selectedCategoryAttributes.map((attr, index) => {
+          // Ensure the attribute exists in the form value
+          const currentValue = field.value?.[index]?.attributeValue || "";
+
+          // Function to update the value at this index
+          const updateValue = (newValue: string) => {
+            const newAttributes = [...(field.value || [])];
+            newAttributes[index] = {
+              categoryAttributeId: attr.attributeId!,
+              attributeValue: newValue,
+            };
+            field.onChange(newAttributes);
+          };
+
+          return (
+            <div key={attr.attributeId} className="space-y-2">
+              <FormLabel>
+                {attr.attributeName} {attr.isRequired && <span className="text-red-500">*</span>}
+              </FormLabel>
+
+              {attr.type === "dropdown" ? (
+                <Select
+                  value={currentValue}
+                  onValueChange={updateValue}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder={`Select ${attr.attributeName}`} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {attr.possibleValuesJson.map((value) => (
+                      <SelectItem key={value} value={value}>
+                        {value}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              ) : attr.type === "checkbox" ? (
+                <Checkbox
+                  checked={currentValue === "true"}
+                  onCheckedChange={(checked) => updateValue(checked ? "true" : "false")}
+                />
+              ) : (
+                <Input
+                  value={currentValue}
+                  onChange={(e) => updateValue(e.target.value)}
+                  placeholder={`Enter ${attr.attributeName}`}
+                />
+              )}
+            </div>
+          );
+        })}
+        <FormMessage />
+      </FormItem>
+    )}
+  />
+)}
+
+                  
 
                   <div className="flex gap-3">
                     <Button type="submit" className="flex-1" disabled={isLoading}>
