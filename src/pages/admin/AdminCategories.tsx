@@ -12,14 +12,13 @@ import { Input } from "@/components/ui/input.tsx";
 import { Textarea } from "@/components/ui/textarea.tsx";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table.tsx";
 import { Badge } from "@/components/ui/badge.tsx";
-import { toast } from "sonner";
 import { categoryApi, Category, CategoryAttribute, CategoryFormData as ApiCategoryFormData } from "@/services/categoryAPI";
 
-// Define form schema with attributes
+// Define form schema with attributes (checkbox type removed)
 const attributeSchema = z.object({
   attributeName: z.string().min(1, "Attribute name is required"),
   type: z.enum(["dropdown", "string"]),
-  isRequired: z.boolean().optional(), // Make isRequired optional to match the type
+  isRequired: z.boolean(),
   possibleValuesJson: z.array(z.string()).optional(),
 });
 
@@ -28,10 +27,8 @@ const categorySchema = z.object({
   categoryAttributes: z.array(attributeSchema),
 });
 
-// Use the inferred type from the schema
 type CategoryFormData = z.infer<typeof categorySchema>;
 
-// Type for the updateAttribute function parameter
 type AttributeField = keyof CategoryAttribute;
 type AttributeValue = string | boolean | string[];
 
@@ -43,7 +40,6 @@ export default function AdminCategories() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Explicitly type the useForm hook with CategoryFormData
   const form = useForm<CategoryFormData>({
     resolver: zodResolver(categorySchema),
     defaultValues: {
@@ -52,7 +48,6 @@ export default function AdminCategories() {
     },
   });
 
-  // Fetch categories on component mount
   useEffect(() => {
     fetchCategories();
   }, []);
@@ -73,17 +68,15 @@ export default function AdminCategories() {
     category.categoryName.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // Explicitly type the onSubmit handler
   const onSubmit = async (data: CategoryFormData): Promise<void> => {
     setIsSubmitting(true);
     try {
-      // Convert form data to API format
       const apiData: ApiCategoryFormData = {
         categoryName: data.categoryName,
         categoryAttributes: data.categoryAttributes.map(attr => ({
           attributeName: attr.attributeName,
           type: attr.type,
-          isRequired: attr.isRequired ?? false, // Handle undefined case
+          isRequired: attr.isRequired,
           possibleValuesJson: attr.possibleValuesJson || [],
         })),
       };
@@ -94,7 +87,6 @@ export default function AdminCategories() {
         await categoryApi.createCategory(apiData);
       }
 
-      // Refresh the categories list
       await fetchCategories();
       handleCloseDialog();
     } catch (error) {
@@ -122,7 +114,6 @@ export default function AdminCategories() {
     if (window.confirm(`Are you sure you want to delete the category "${categoryName}"?`)) {
       try {
         await categoryApi.deleteCategory(categoryId);
-        // Refresh the categories list
         await fetchCategories();
       } catch (error) {
         console.error("Error deleting category:", error);
@@ -148,7 +139,6 @@ export default function AdminCategories() {
     setIsDialogOpen(true);
   };
 
-  // Add a new attribute field
   const addAttribute = (): void => {
     const currentAttributes = form.getValues("categoryAttributes") || [];
     form.setValue("categoryAttributes", [
@@ -157,18 +147,15 @@ export default function AdminCategories() {
     ]);
   };
 
-  // Remove an attribute field
   const removeAttribute = (index: number): void => {
     const currentAttributes = form.getValues("categoryAttributes") || [];
     form.setValue("categoryAttributes", currentAttributes.filter((_, i) => i !== index));
   };
 
-  // Update attribute field with proper typing
   const updateAttribute = (index: number, field: AttributeField, value: AttributeValue): void => {
     const currentAttributes = form.getValues("categoryAttributes") || [];
     const updatedAttributes = [...currentAttributes];
 
-    // Create a new object with the updated field
     updatedAttributes[index] = {
       ...updatedAttributes[index],
       [field]: value,
@@ -278,7 +265,7 @@ export default function AdminCategories() {
                               <input
                                 type="checkbox"
                                 id={`required-${index}`}
-                                checked={attribute.isRequired ?? false} // Handle undefined case
+                                checked={attribute.isRequired}
                                 onChange={(e) => updateAttribute(index, "isRequired", e.target.checked)}
                                 className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
                               />
@@ -288,7 +275,7 @@ export default function AdminCategories() {
                             </div>
                           </FormItem>
 
-                          {(attribute.type === "dropdown") && (
+                          {attribute.type === "dropdown" && (
                             <FormItem>
                               <FormLabel>Possible Values (one per line)</FormLabel>
                               <FormControl>
