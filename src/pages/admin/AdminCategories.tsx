@@ -18,7 +18,7 @@ import { categoryApi, Category, CategoryAttribute, CategoryFormData as ApiCatego
 // Define form schema with attributes
 const attributeSchema = z.object({
   attributeName: z.string().min(1, "Attribute name is required"),
-  type: z.enum(["dropdown", "string", "checkbox"]),
+  type: z.enum(["dropdown", "string"]),
   isRequired: z.boolean().optional(), // Make isRequired optional to match the type
   possibleValuesJson: z.array(z.string()).optional(),
 });
@@ -262,13 +262,12 @@ export default function AdminCategories() {
                                   onChange={(e) => updateAttribute(
                                     index,
                                     "type",
-                                    e.target.value as "dropdown" | "string" | "checkbox"
+                                    e.target.value as "dropdown" | "string"
                                   )}
                                   className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                                 >
                                   <option value="dropdown">Dropdown</option>
                                   <option value="string">Text</option>
-                                  <option value="checkbox">Checkbox</option>
                                 </select>
                               </FormControl>
                             </FormItem>
@@ -289,7 +288,7 @@ export default function AdminCategories() {
                             </div>
                           </FormItem>
 
-                          {(attribute.type === "dropdown" || attribute.type === "checkbox") && (
+                          {(attribute.type === "dropdown") && (
                             <FormItem>
                               <FormLabel>Possible Values (one per line)</FormLabel>
                               <FormControl>
