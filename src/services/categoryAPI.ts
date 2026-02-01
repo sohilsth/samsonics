@@ -30,7 +30,7 @@ export interface CategoryAttribute {
   attributeId?: string;
   attributeName: string;
   possibleValuesJson: string[];
-  type: 'dropdown' | 'string' | 'checkbox';
+  type: 'dropdown' | 'string';
   isRequired: boolean;
 }
 
