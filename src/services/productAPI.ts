@@ -30,20 +30,22 @@ export interface ApiResponse<T = unknown> {
 
 // Types
 export interface ProductAttribute {
-  CategoryAttrId: string;
-  AttributeName: string;
-  AttributeValue: string;
-  ProductAttributeType: 'dropdown' | 'string' | 'checkbox';
+  productAttributeId: string;
+  categoryAttributeId: string;
+  attributeName: string;
+  attributeValue: string;
+  productAttributeType: 'dropdown' | 'string' | 'checkbox';
 }
 
 export interface Product {
   productId: string;
   categoryId: string;
+  categoryName: string;
   productName: string;
   productDescription: string;
   productImageUrl: string;
   productQuantity: number; 
-  productUnitPrice: number | null; // Allow null
+  productUnitPrice: number | null;
   hotDeals: boolean;
   productAttributes: ProductAttribute[];
 }
@@ -56,6 +58,12 @@ export interface PaginatedProductResponse {
   pageSize: number;
 }
 
+// Product attribute input for form (simplified)
+export interface ProductAttributeInput {
+  categoryAttributeId: string;
+  attributeValue: string;
+}
+
 // Product form data (for creating/updating)
 export interface ProductFormData {
   categoryId: string;
@@ -65,7 +73,7 @@ export interface ProductFormData {
   productQuantity: number;
   productUnitPrice: number;
   hotDeals: boolean;
-  productAttributes: ProductAttribute[];
+  productAttributes: ProductAttributeInput[];
 }
 
 // Filter parameters for product view API
@@ -99,7 +107,6 @@ export const productApi = {
         pageNumber: filter.pageNumber.toString(),
         pageSize: filter.pageSize.toString(),
         ...(filter.categoryId !== undefined ? { categoryId: filter.categoryId.toString() } : {}),
-        // Add more filters here if needed
       });
 
       const response = await fetch(`${API_BASE_URL}/product/view?${queryParams.toString()}`, {
