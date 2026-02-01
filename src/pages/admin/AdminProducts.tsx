@@ -15,7 +15,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge.tsx";
 import { Checkbox } from "@/components/ui/checkbox.tsx";
 import { toast } from "sonner";
-import { productApi, Product, ProductFormData, PaginatedProductResponse, ProductFilter } from "@/services/productAPI.ts";
+import { productApi, Product, ProductFormData, PaginatedProductResponse, ProductFilter, ProductAttributeInput } from "@/services/productAPI.ts";
 import { categoryApi, Category, CategoryAttribute } from "@/services/categoryAPI.ts";
 
 // Form schema aligned with ProductFormData
@@ -29,10 +29,8 @@ const productSchema = z.object({
   productImage: z.instanceof(File).nullable(),
   productAttributes: z.array(
     z.object({
-      CategoryAttrId: z.string().min(1, "Attribute ID is required"),
-      AttributeName: z.string().min(1, "Attribute name is required"),
-      AttributeValue: z.string().min(1, "Attribute value is required"),
-      ProductAttributeType: z.enum(["dropdown", "string", "checkbox"]),
+      categoryAttributeId: z.string().min(1, "Attribute ID is required"),
+      attributeValue: z.string().min(1, "Attribute value is required"),
     })
   ).optional(),
 });
@@ -120,7 +118,7 @@ export default function AdminProducts() {
         productAttributes: data.productAttributes || [],
       };
 
-      setIsLoading(true); // Start loading
+      setIsLoading(true);
       if (editingProduct) {
         await productApi.updateProduct(editingProduct.productId, productData);
       } else {
@@ -133,13 +131,20 @@ export default function AdminProducts() {
     } catch (error) {
       console.error("Error saving product:", error);
     } finally {
-      setIsLoading(false); // Stop loading
+      setIsLoading(false);
     }
   };
 
   const handleEdit = async (product: Product) => {
-    console.log("Editing product:", product); // Debug log to inspect product data
+    console.log("Editing product:", product);
     setEditingProduct(product);
+    
+    // Convert ProductAttribute[] to ProductAttributeInput[] for the form
+    const formAttributes: ProductAttributeInput[] = product.productAttributes.map(attr => ({
+      categoryAttributeId: attr.categoryAttributeId,
+      attributeValue: attr.attributeValue,
+    }));
+    
     form.reset({
       productName: product.productName || "",
       productUnitPrice: product.productUnitPrice != null ? product.productUnitPrice.toString() : "",
@@ -148,7 +153,7 @@ export default function AdminProducts() {
       productQuantity: product.productQuantity != null ? product.productQuantity.toString() : "",
       hotDeals: product.hotDeals || false,
       productImage: null,
-      productAttributes: product.productAttributes || [],
+      productAttributes: formAttributes,
     });
     setIsDialogOpen(true);
   };
@@ -356,14 +361,12 @@ export default function AdminProducts() {
                               </FormLabel>
                               {attr.type === "dropdown" ? (
                                 <Select
-                                  value={field.value?.[index]?.AttributeValue || ""}
+                                  value={field.value?.[index]?.attributeValue || ""}
                                   onValueChange={(value) => {
                                     const newAttributes = [...(field.value || [])];
                                     newAttributes[index] = {
-                                      CategoryAttrId: attr.attributeId!,
-                                      AttributeName: attr.attributeName,
-                                      AttributeValue: value,
-                                      ProductAttributeType: attr.type,
+                                      categoryAttributeId: attr.attributeId!,
+                                      attributeValue: value,
                                     };
                                     field.onChange(newAttributes);
                                   }}
@@ -381,28 +384,24 @@ export default function AdminProducts() {
                                 </Select>
                               ) : attr.type === "checkbox" ? (
                                 <Checkbox
-                                  checked={field.value?.[index]?.AttributeValue === "true"}
+                                  checked={field.value?.[index]?.attributeValue === "true"}
                                   onCheckedChange={(checked) => {
                                     const newAttributes = [...(field.value || [])];
                                     newAttributes[index] = {
-                                      CategoryAttrId: attr.attributeId!,
-                                      AttributeName: attr.attributeName,
-                                      AttributeValue: checked ? "true" : "false",
-                                      ProductAttributeType: attr.type,
+                                      categoryAttributeId: attr.attributeId!,
+                                      attributeValue: checked ? "true" : "false",
                                     };
                                     field.onChange(newAttributes);
                                   }}
                                 />
                               ) : (
                                 <Input
-                                  value={field.value?.[index]?.AttributeValue || ""}
+                                  value={field.value?.[index]?.attributeValue || ""}
                                   onChange={(e) => {
                                     const newAttributes = [...(field.value || [])];
                                     newAttributes[index] = {
-                                      CategoryAttrId: attr.attributeId!,
-                                      AttributeName: attr.attributeName,
-                                      AttributeValue: e.target.value,
-                                      ProductAttributeType: attr.type,
+                                      categoryAttributeId: attr.attributeId!,
+                                      attributeValue: e.target.value,
                                     };
                                     field.onChange(newAttributes);
                                   }}
@@ -513,11 +512,9 @@ export default function AdminProducts() {
                         </div>
                       </TableCell>
                       <TableCell>
-                        <Badge variant="secondary">
-                          {categories.find((c) => c.categoryId === product.categoryId)?.categoryName || product.categoryId}
-                        </Badge>
+                        <Badge variant="secondary">{product.categoryName}</Badge>
                       </TableCell>
-                      <TableCell className="font-mono">{product.productUnitPrice != null ? `NRS.${product.productUnitPrice}` : "N/A"}</TableCell>
+                      <TableCell className="font-mono">{product.productUnitPrice != null ? `NRS.${product.productUnitPrice.toLocaleString()}` : "N/A"}</TableCell>
                       <TableCell>{product.productQuantity != null ? product.productQuantity : "N/A"}</TableCell>
                       <TableCell>
                         {product.hotDeals && (
